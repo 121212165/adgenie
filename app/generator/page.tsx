@@ -27,7 +27,14 @@ export default function GeneratorPage() {
   const [ads, setAds] = useState<Ad[]>([]);
   const [activePlatform, setActivePlatform] = useState<Ad["platform"]>("facebook");
   const [errorMsg, setErrorMsg] = useState("");
+  const [credits, setCredits] = useState<number | null>(3); // AC-4.3 额度实时显示
+  const [showPaywall, setShowPaywall] = useState(false); // AC-4.1 用尽弹付费引导
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // 初始查额度(AC-4.3)
+  useState(() => {
+    fetch("/api/credits").then(r => r.json()).then(d => { if (d.ok) setCredits(d.credits); }).catch(() => {});
+  });
 
   // 上传(本地预览,不发服务器)
   function onFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -53,6 +60,10 @@ export default function GeneratorPage() {
   }
 
   async function onGenerate() {
+    if (credits !== null && credits <= 0) {
+      setShowPaywall(true); // 用尽先弹引导
+      return;
+    }
     if (!image) {
       setStatus("error");
       setErrorMsg("请先上传商品图(AC-1)");
@@ -76,6 +87,12 @@ export default function GeneratorPage() {
       setAds(data.ads);
       setActivePlatform(data.ads[0]?.platform ?? "facebook");
       setStatus("done");
+      // AC-4:每次生成扣 1 次额度(mock:前端递减;真实:由 api/generate 服务端扣减)
+      setCredits((c) => {
+        const left = Math.max(0, (c ?? 3) - 1);
+        if (left <= 0) setShowPaywall(true); // 用尽弹付费引导,不阻断已生成内容
+        return left;
+      });
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "生成失败,请重试(AC-2.3)");
@@ -194,7 +211,7 @@ export default function GeneratorPage() {
 
             <p className="mt-3 flex items-center gap-2 text-xs text-[#6B7280]">
               <span className="inline-flex h-2 w-2 rounded-full bg-[#00B894]" />
-              剩余额度:3 次(免费试用)
+              剩余额度:{credits ?? "-"} 次(免费试用,AC-4)
             </p>
           </div>
 
@@ -269,6 +286,36 @@ export default function GeneratorPage() {
           </div>
         </div>
       </main>
+
+
+      {/* AC-4.1 付费引导弹窗(额度用尽;不阻断已生成内容下载) */}
+      {showPaywall && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+            <h3 className="text-xl font-bold">免费额度已用完</h3>
+            <p className="mt-2 text-sm text-[#6B7280]">
+              升级 Pro 解锁无限生成 + 2048px 无水印。已生成的内容仍可随时下载。
+            </p>
+            <button
+              onClick={async () => {
+                const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+                const d = await res.json();
+                if (d.ok && d.checkoutUrl) window.location.href = d.checkoutUrl;
+                else setErrorMsg(d.error ?? "支付入口暂不可用");
+              }}
+              className="mt-5 w-full rounded-xl bg-[#6C5CE7] py-3 font-semibold text-white transition-colors hover:bg-[#5a4bd1]"
+            >
+              升级 Pro · $9/月
+            </button>
+            <button
+              onClick={() => setShowPaywall(false)}
+              className="mt-2 w-full rounded-xl border border-black/10 py-2.5 text-sm font-medium text-[#6B7280] hover:bg-black/5"
+            >
+              先继续使用(保留已生成内容)
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
