@@ -1,0 +1,1 @@
+export default function GeneratorPage() { return <div className="min-h-screen bg-white p-12 font-sans text-[#1A1A2E]"><h1 className="text-2xl font-bold">生成器(开发中)</h1><p className="mt-2 text-[#6B7280]">上传商品图 → 生成广告素材 → 导出(核心动线开发中)</p></div>; }

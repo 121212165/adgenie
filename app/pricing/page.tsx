@@ -1,0 +1,1 @@
+export default function PricingPage() { return <div className="min-h-screen bg-white p-12 font-sans text-[#1A1A2E]"><h1 className="text-2xl font-bold">定价(开发中)</h1><p className="mt-2 text-[#6B7280]">免费 3 次 / Pro $9 每月(Stripe 接入中)</p></div>; }
