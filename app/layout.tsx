@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   description:
     "上传商品图,10 分钟生成 Facebook / Instagram / TikTok 广告创意图 + 文案,一键导出。面向独立电商卖家的 AI 广告素材工具。",
 };
-};
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
