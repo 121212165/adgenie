@@ -147,9 +147,15 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-black/5 py-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 text-sm text-[#6B7280]">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 text-sm text-[#6B7280] sm:flex-row">
           <span>© 2026 AdGenie</span>
-          <span>Made for indie sellers</span>
+          <nav className="flex flex-wrap items-center gap-4">
+            <Link href="/terms" className="hover:text-[#1A1A2E]">Terms</Link>
+            <Link href="/privacy" className="hover:text-[#1A1A2E]">Privacy</Link>
+            <Link href="/refund" className="hover:text-[#1A1A2E]">Refund</Link>
+            <Link href="/acceptable-use" className="hover:text-[#1A1A2E]">Acceptable Use</Link>
+            <Link href="/contact" className="hover:text-[#1A1A2E]">Contact</Link>
+          </nav>
         </div>
       </footer>
     </div>
