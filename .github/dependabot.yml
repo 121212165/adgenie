@@ -7,6 +7,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 20
+    open-pull-requests-limit: 8
     commit-message:
       prefix: "deps"
+      groups:
+        all-deps:
+          patterns:
+            - "*"
